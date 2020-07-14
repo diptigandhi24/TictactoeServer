@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "jest --watch"
   },
   "author": "",
@@ -17,5 +18,8 @@
   "devDependencies": {
     "jest": "^25.1.0",
     "nodemon": "^2.0.3"
+  },
+  "engine": {
+    "node": "12.x"
   }
 }

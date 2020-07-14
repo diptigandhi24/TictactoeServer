@@ -80,16 +80,12 @@ app.post("/updateplayermove", cors(), (req, res) => {
   let { rowId, colId, squareId } = playerinfo;
   let verify = verification(playerinfo, gameData);
   updateFeildRequest += 1;
-  console.log("updateFeildRequest", playerinfo.player);
-  // console.log(
-  //   "Verification of the player is",
-  //   playerinfo,
-  //   typeof playerinfo,
-  //   verify
-  // );
+  console.log("Received", playerinfo.player, rowId, colId, squareId);
+
   if (verify == true && Object.keys(currentMove).length == 0) {
     //update the currentMove
     currentMove = {
+      player: playerinfo.player,
       yourTurn: true,
       id: squareId,
       rowId: rowId,
@@ -101,9 +97,19 @@ app.post("/updateplayermove", cors(), (req, res) => {
 
 app.post("/getplayermove", cors(), (req, res) => {
   let playerinfo = req.body;
-  console.log("Get Next move request obj", playerinfo.player);
+  // console.log("Get Next move request obj", playerinfo.player);
   let verify = verification(playerinfo, gameData);
-  if (verify == true && Object.keys(currentMove).length != 0) {
+  if (
+    verify == true &&
+    Object.keys(currentMove).length != 0 &&
+    currentMove.player != playerinfo.player
+  ) {
+    console.log(
+      "Transmitted",
+      playerinfo.player,
+      currentMove.rowId,
+      currentMove.colId
+    );
     res.send(currentMove);
     currentMove = {};
   } else {
