@@ -6,12 +6,14 @@ let verification = require("./updatePlayermove").verification;
 // let roomRouter = require("./roomRouter");
 let cors = require("cors");
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({
-  extended: true
-})); // support encoded bodies
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+); // support encoded bodies
 let gameData = new Map();
 let gameId = 0;
 
@@ -27,18 +29,24 @@ function handleRequest(req, res) {
   if (gameData.has(gameId) === false) {
     // console.log("registration of player1");
     currentRegistrationPlayer = "player1";
-    initiateGameReq({
-      playerName,
-      gameId
-    }, gameData);
+    initiateGameReq(
+      {
+        playerName,
+        gameId,
+      },
+      gameData
+    );
   } else {
     if (gameData.has(gameId) === true) {
       // console.log("registration of player2", gameId);
       currentRegistrationPlayer = "player2";
-      addSecondPlayer({
-        playerName,
-        gameId
-      }, gameData);
+      addSecondPlayer(
+        {
+          playerName,
+          gameId,
+        },
+        gameData
+      );
     }
   }
 
@@ -58,15 +66,13 @@ function handleRequest(req, res) {
   res.send({
     playerInfo,
     gameId,
-    beginGame
+    beginGame,
   });
 }
 
-app.get('/', (req, res) => {
-  res.send(
-    'Welcome to the Tic Tac Toe Server'
-  )
-})
+app.get("/", (req, res) => {
+  res.send("Welcome to the Tic Tac Toe Server");
+});
 
 app.post("/", (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
 
@@ -88,7 +94,7 @@ app.post("/requestingPlayer2Details", (req, res) => {
     res.send({
       playerInfo,
       gameId,
-      beginGame
+      beginGame,
     });
   }
   //  else {
@@ -99,11 +105,7 @@ app.post("/requestingPlayer2Details", (req, res) => {
 
 app.post("/updateplayermove", (req, res) => {
   let playerinfo = req.body;
-  let {
-    rowId,
-    colId,
-    squareId
-  } = playerinfo;
+  let { rowId, colId, squareId } = playerinfo;
   let verify = verification(playerinfo, gameData);
   updateFeildRequest += 1;
   console.log("Received", playerinfo.player, rowId, colId, squareId);
@@ -118,7 +120,7 @@ app.post("/updateplayermove", (req, res) => {
       colId: colId,
     };
     res.send({
-      sucess: "success"
+      sucess: "success",
     });
   }
 });
@@ -142,7 +144,7 @@ app.post("/getplayermove", (req, res) => {
     currentMove = {};
   } else {
     res.send({
-      wait: "wait"
+      wait: "wait",
     });
   }
 });
