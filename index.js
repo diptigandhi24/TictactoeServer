@@ -7,7 +7,7 @@ let verification = require("./updatePlayermove").verification;
 let cors = require("cors");
 const app = express();
 const port = 5000;
-app.all("*", cors());
+app.use(cors());
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({
   extended: true
@@ -62,16 +62,16 @@ function handleRequest(req, res) {
   });
 }
 
-app.get('/', cors(), (req, res) => {
+app.get('/', (req, res) => {
   res.send(
     'Welcome to the Tic Tac Toe Server'
   )
 })
 
-app.post("/", cors(), (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
+app.post("/", (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
 
 //I think Server need to the board identity, associated player name and pass to that board on the safer side
-app.post("/requestingPlayer2Details", cors(), (req, res) => {
+app.post("/requestingPlayer2Details", (req, res) => {
   //reply to player1Request
   // console.log("Details send to get the information about player2", req.body);
   let gameId = req.body.gameId;
@@ -97,7 +97,7 @@ app.post("/requestingPlayer2Details", cors(), (req, res) => {
   // }
 });
 
-app.post("/updateplayermove", cors(), (req, res) => {
+app.post("/updateplayermove", (req, res) => {
   let playerinfo = req.body;
   let {
     rowId,
@@ -123,7 +123,7 @@ app.post("/updateplayermove", cors(), (req, res) => {
   }
 });
 
-app.post("/getplayermove", cors(), (req, res) => {
+app.post("/getplayermove", (req, res) => {
   let playerinfo = req.body;
   // console.log("Get Next move request obj", playerinfo.player);
   let verify = verification(playerinfo, gameData);
