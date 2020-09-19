@@ -9,7 +9,9 @@ const app = express();
 const port = 5000;
 app.all("*", cors());
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(bodyParser.urlencoded({
+  extended: true
+})); // support encoded bodies
 let gameData = new Map();
 let gameId = 0;
 
@@ -25,12 +27,18 @@ function handleRequest(req, res) {
   if (gameData.has(gameId) === false) {
     // console.log("registration of player1");
     currentRegistrationPlayer = "player1";
-    initiateGameReq({ playerName, gameId }, gameData);
+    initiateGameReq({
+      playerName,
+      gameId
+    }, gameData);
   } else {
     if (gameData.has(gameId) === true) {
       // console.log("registration of player2", gameId);
       currentRegistrationPlayer = "player2";
-      addSecondPlayer({ playerName, gameId }, gameData);
+      addSecondPlayer({
+        playerName,
+        gameId
+      }, gameData);
     }
   }
 
@@ -47,8 +55,18 @@ function handleRequest(req, res) {
     playerInfo = gameData.get(gameId)[currentRegistrationPlayer];
   }
   let beginGame = gameData.get(gameId)["beginGame"];
-  res.send({ playerInfo, gameId, beginGame });
+  res.send({
+    playerInfo,
+    gameId,
+    beginGame
+  });
 }
+
+app.get('/', cors(), (req, res) => {
+  res.send(
+    'Welcome to the Tic Tac Toe Server'
+  )
+})
 
 app.post("/", cors(), (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
 
@@ -67,7 +85,11 @@ app.post("/requestingPlayer2Details", cors(), (req, res) => {
     playerInfo.player1Name = req.body.player1Name;
     playerInfo.password = req.body.password;
     playerInfo.player2Name = player2Name;
-    res.send({ playerInfo, gameId, beginGame });
+    res.send({
+      playerInfo,
+      gameId,
+      beginGame
+    });
   }
   //  else {
   //   let player2Name = undefined;
@@ -77,7 +99,11 @@ app.post("/requestingPlayer2Details", cors(), (req, res) => {
 
 app.post("/updateplayermove", cors(), (req, res) => {
   let playerinfo = req.body;
-  let { rowId, colId, squareId } = playerinfo;
+  let {
+    rowId,
+    colId,
+    squareId
+  } = playerinfo;
   let verify = verification(playerinfo, gameData);
   updateFeildRequest += 1;
   console.log("Received", playerinfo.player, rowId, colId, squareId);
@@ -91,7 +117,9 @@ app.post("/updateplayermove", cors(), (req, res) => {
       rowId: rowId,
       colId: colId,
     };
-    res.send({ sucess: "success" });
+    res.send({
+      sucess: "success"
+    });
   }
 });
 
@@ -113,7 +141,9 @@ app.post("/getplayermove", cors(), (req, res) => {
     res.send(currentMove);
     currentMove = {};
   } else {
-    res.send({ wait: "wait" });
+    res.send({
+      wait: "wait"
+    });
   }
 });
 
