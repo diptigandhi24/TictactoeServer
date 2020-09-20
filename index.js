@@ -6,10 +6,14 @@ let verification = require("./updatePlayermove").verification;
 // let roomRouter = require("./roomRouter");
 let cors = require("cors");
 const app = express();
-const port = 5000;
-app.all("*", cors());
+const port = process.env.PORT || 5000;
+app.use(cors());
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+); // support encoded bodies
 let gameData = new Map();
 let gameId = 0;
 
@@ -25,12 +29,24 @@ function handleRequest(req, res) {
   if (gameData.has(gameId) === false) {
     // console.log("registration of player1");
     currentRegistrationPlayer = "player1";
-    initiateGameReq({ playerName, gameId }, gameData);
+    initiateGameReq(
+      {
+        playerName,
+        gameId,
+      },
+      gameData
+    );
   } else {
     if (gameData.has(gameId) === true) {
       // console.log("registration of player2", gameId);
       currentRegistrationPlayer = "player2";
-      addSecondPlayer({ playerName, gameId }, gameData);
+      addSecondPlayer(
+        {
+          playerName,
+          gameId,
+        },
+        gameData
+      );
     }
   }
 
@@ -47,13 +63,21 @@ function handleRequest(req, res) {
     playerInfo = gameData.get(gameId)[currentRegistrationPlayer];
   }
   let beginGame = gameData.get(gameId)["beginGame"];
-  res.send({ playerInfo, gameId, beginGame });
+  res.send({
+    playerInfo,
+    gameId,
+    beginGame,
+  });
 }
 
-app.post("/", cors(), (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
+app.get("/", (req, res) => {
+  res.send("Welcome to the Tic Tac Toe Server");
+});
+
+app.post("/", (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
 
 //I think Server need to the board identity, associated player name and pass to that board on the safer side
-app.post("/requestingPlayer2Details", cors(), (req, res) => {
+app.post("/requestingPlayer2Details", (req, res) => {
   //reply to player1Request
   // console.log("Details send to get the information about player2", req.body);
   let gameId = req.body.gameId;
@@ -67,7 +91,11 @@ app.post("/requestingPlayer2Details", cors(), (req, res) => {
     playerInfo.player1Name = req.body.player1Name;
     playerInfo.password = req.body.password;
     playerInfo.player2Name = player2Name;
-    res.send({ playerInfo, gameId, beginGame });
+    res.send({
+      playerInfo,
+      gameId,
+      beginGame,
+    });
   }
   //  else {
   //   let player2Name = undefined;
@@ -75,7 +103,7 @@ app.post("/requestingPlayer2Details", cors(), (req, res) => {
   // }
 });
 
-app.post("/updateplayermove", cors(), (req, res) => {
+app.post("/updateplayermove", (req, res) => {
   let playerinfo = req.body;
   let { rowId, colId, squareId } = playerinfo;
   let verify = verification(playerinfo, gameData);
@@ -91,11 +119,13 @@ app.post("/updateplayermove", cors(), (req, res) => {
       rowId: rowId,
       colId: colId,
     };
-    res.send({ sucess: "success" });
+    res.send({
+      sucess: "success",
+    });
   }
 });
 
-app.post("/getplayermove", cors(), (req, res) => {
+app.post("/getplayermove", (req, res) => {
   let playerinfo = req.body;
   // console.log("Get Next move request obj", playerinfo.player);
   let verify = verification(playerinfo, gameData);
@@ -113,7 +143,9 @@ app.post("/getplayermove", cors(), (req, res) => {
     res.send(currentMove);
     currentMove = {};
   } else {
-    res.send({ wait: "wait" });
+    res.send({
+      wait: "wait",
+    });
   }
 });
 
