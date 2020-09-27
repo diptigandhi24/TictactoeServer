@@ -3,7 +3,7 @@ var bodyParser = require("body-parser");
 let initiateGameReq = require("./gameDetails").initiateGameReq;
 let addSecondPlayer = require("./gameDetails").addPlayer2;
 let verification = require("./updatePlayermove").verification;
-// let roomRouter = require("./roomRouter");
+
 let cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -16,7 +16,6 @@ app.use(
 ); // support encoded bodies
 let gameData = new Map();
 let gameId = 0;
-
 let currentMove = {};
 let playerIdentity = "";
 let updateFeildRequest = 0;
@@ -63,6 +62,7 @@ function handleRequest(req, res) {
     playerInfo = gameData.get(gameId)[currentRegistrationPlayer];
   }
   let beginGame = gameData.get(gameId)["beginGame"];
+
   res.send({
     playerInfo,
     gameId,
@@ -76,8 +76,12 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
 
+app.get("/register-player/player-2", (req, res) => {
+  handleRequest(req, res);
+}); // only this function does ask for the password for the register player
+
 //I think Server need to the board identity, associated player name and pass to that board on the safer side
-app.post("/requestingPlayer2Details", (req, res) => {
+app.post("/requesting-player2-details", (req, res) => {
   //reply to player1Request
   // console.log("Details send to get the information about player2", req.body);
   let gameId = req.body.gameId;
@@ -105,12 +109,14 @@ app.post("/requestingPlayer2Details", (req, res) => {
 
 app.post("/updateplayermove", (req, res) => {
   let playerinfo = req.body;
+  // TODO: what does squareId do?
   let { rowId, colId, squareId } = playerinfo;
   let verify = verification(playerinfo, gameData);
+  // TODO: what does updateFieldRequest do?
   updateFeildRequest += 1;
   console.log("Received", playerinfo.player, rowId, colId, squareId);
 
-  if (verify == true && Object.keys(currentMove).length == 0) {
+  if (verify && Object.keys(currentMove).length == 0) {
     //update the currentMove
     currentMove = {
       player: playerinfo.player,
