@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan");
 var bodyParser = require("body-parser");
 let initiateGameReq = require("./gameDetails").initiateGameReq;
 let addSecondPlayer = require("./gameDetails").addPlayer2;
@@ -9,6 +10,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json()); // support json encoded bodies
+app.use(morgan());
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -25,9 +27,11 @@ function handleRequest(req, res) {
   let playerName = req.body.playerName;
   gameId = req.body.gameId;
   let currentRegistrationPlayer;
+  //if game registered already
   if (gameData.has(gameId) === false) {
     // console.log("registration of player1");
     currentRegistrationPlayer = "player1";
+    // only runs if the game Id has not been created
     initiateGameReq(
       {
         playerName,
@@ -74,7 +78,9 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Tic Tac Toe Server");
 });
 
-app.post("/", (req, res) => handleRequest(req, res)); // only this function does ask for the password for the register player
+app.post("/", (req, res) => {
+  handleRequest(req, res);
+}); // only this function does ask for the password for the register player
 
 app.get("/register-player/player-2", (req, res) => {
   handleRequest(req, res);
