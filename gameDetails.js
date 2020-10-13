@@ -14,6 +14,7 @@ function initiateGameReq( clientDetails, gameData) {
  let player1 = createPlayerInfo(clientDetails)
   gameData.set(clientDetails.gameId, {player1})
   gameData.get(clientDetails.gameId)["beginGame"] =false
+  gameData.get(clientDetails.gameId)["currentMove"] = {}
   return gameData;
 }
 
